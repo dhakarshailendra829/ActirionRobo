@@ -1,25 +1,22 @@
-# visualization.py - FINAL LOOK MATCH: CYBERPUNK/HOLOGRAM STYLE
 import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
 import pandas as pd
 
-# --- Global Plotly Styling Configuration and NEON Colors ---
 PLOTLY_CONFIG = {
     'displayModeBar': False,
     'responsive': True
 }
-# Colors adjusted to match the image's specific hues (Deep Purple/Orange on Dark)
+
 DARK_BG = '#0B0F1A'             
 GRID_COLOR = '#1E253A'          
-NEON_BLUE = '#11F5FF'           # End Effector / Holo lines
-NEON_PURPLE = '#AF2AFF'         # Holo Accent / Points
-NEON_ORANGE = '#FF7F0E'         # Joint / Robot Base Accent
-ROBOT_LINK_COLOR = '#FF9966'    # The main orange-pink link color in the image
-BASE_COLOR = '#5A3F7B'          # Dark Purple Base/Container Color
+NEON_BLUE = '#11F5FF'          
+NEON_PURPLE = '#AF2AFF'         
+NEON_ORANGE = '#FF7F0E'         
+ROBOT_LINK_COLOR = '#FF9966'    
+BASE_COLOR = '#5A3F7B'          
 
-# --- Helper function for 3D Kinematics (Ensures consistency) ---
 def _get_link_positions_3d(action, link_length=1.0):
     x_coords = [0.0]
     y_coords = [0.0]
@@ -41,7 +38,6 @@ def _get_link_positions_3d(action, link_length=1.0):
             
     return x_coords, y_coords, z_coords
 
-# 1. plot_3d_robot (Cylinder Container Look)
 def plot_3d_robot(
     robot_actions,
     num_joints,
@@ -59,25 +55,21 @@ def plot_3d_robot(
     
     fig3 = go.Figure()
 
-    # --- 1. Holo-Cylinder Container (To match the image's base and surrounding glow) ---
     z_max = num_joints * 0.5 + 1.5
     radius = num_joints + 1.5
     
-    # Generate points for the cylinder walls
     theta = np.linspace(0, 2 * np.pi, 50)
     x_cyl = radius * np.cos(theta)
     y_cyl = radius * np.sin(theta)
     
-    # Base Disk (A subtle plane near the bottom)
     fig3.add_trace(go.Mesh3d(
         x=np.append(x_cyl, 0), y=np.append(y_cyl, 0), z=[0]*50 + [0],
         alphahull=5,
-        opacity=0.3, # Dark transparent floor
+        opacity=0.3, 
         color=BASE_COLOR,
         hoverinfo='none', name='Base'
     ))
     
-    # Holo Rings (Neon Blue/Purple rings)
     fig3.add_trace(go.Scatter3d(
         x=x_cyl, y=y_cyl, z=[z_max]*50, 
         mode='lines',
@@ -93,16 +85,14 @@ def plot_3d_robot(
         hoverinfo='none', name='Holo Base Ring'
     ))
     
-    # --- 2. Plot Robot Links (To match the orange-pink link color) ---
     fig3.add_trace(go.Scatter3d(
         x=x_coords, y=y_coords, z=z_coords,
         mode='lines',
-        line=dict(color=ROBOT_LINK_COLOR, width=20), # Wide links
+        line=dict(color=ROBOT_LINK_COLOR, width=20), 
         name='Robot Links',
         hoverinfo='none'
     ))
 
-    # --- 3. Plot Joints and End-Effector (Neon Accents) ---
     fig3.add_trace(go.Scatter3d(
         x=x_coords, y=y_coords, z=z_coords,
         mode='markers',
@@ -119,7 +109,6 @@ def plot_3d_robot(
         name='End Effector',
     ))
     
-    # --- 4. Layout and Cyberpunk Scene ---
     fig3.update_layout(
         title=f'**{title}**',
         scene=dict(
@@ -145,12 +134,10 @@ def plot_3d_robot(
     st.plotly_chart(fig3, use_container_width=True, config=PLOTLY_CONFIG, key=key)
 
 
-# 2. plot_end_effector_path (Grid Trajectory Look)
 def plot_end_effector_path(positions, task_colors, key=None): 
     x, y, z = zip(*positions)
     fig = go.Figure()
     
-    # 1. Path Line (Thicker Neon Glow)
     fig.add_trace(go.Scatter3d(
         x=x, y=y, z=z,
         mode='lines',
@@ -158,11 +145,6 @@ def plot_end_effector_path(positions, task_colors, key=None):
         name='Trajectory Path',
     ))
     
-    # 2. Task Points (Markers) with color coding
-    # Using specific colors to match the points (e.g., Pink/Green/Orange/Blue)
-    # The image uses large, distinct markers for start/end points.
-    
-    # Create distinct colors for the trajectory points based on index for a colorful look
     path_colors_list = [NEON_PURPLE, NEON_ORANGE, NEON_BLUE, '#33FF66'] * (len(positions) // 4 + 1)
     
     fig.add_trace(go.Scatter3d(
@@ -179,7 +161,6 @@ def plot_end_effector_path(positions, task_colors, key=None):
         hoverinfo='text'
     ))
     
-    # --- Layout and Cyberpunk Scene ---
     fig.update_layout(
         title="**3D End-Effector Task Trajectory**", 
         scene=dict(
@@ -189,7 +170,6 @@ def plot_end_effector_path(positions, task_colors, key=None):
             yaxis_title='Y',
             zaxis_title='Z',
             
-            # Make Grid Denser and Neon, similar to the image's right plot
             xaxis=dict(gridcolor=GRID_COLOR, zerolinecolor=NEON_PURPLE, nticks=8, showbackground=True, backgroundcolor=DARK_BG, showspikes=False),
             yaxis=dict(gridcolor=GRID_COLOR, zerolinecolor=NEON_PURPLE, nticks=8, showbackground=True, backgroundcolor=DARK_BG, showspikes=False),
             zaxis=dict(gridcolor=GRID_COLOR, zerolinecolor=NEON_PURPLE, nticks=8, showbackground=True, backgroundcolor=DARK_BG, showspikes=False),
@@ -197,7 +177,7 @@ def plot_end_effector_path(positions, task_colors, key=None):
             camera=dict(
                 up=dict(x=0, y=0, z=1),
                 center=dict(x=0, y=0, z=0),
-                eye=dict(x=1.8, y=1.8, z=0.8) # Adjusted for better angled view
+                eye=dict(x=1.8, y=1.8, z=0.8) 
             )
         ),
         template="plotly_dark",
@@ -207,10 +187,7 @@ def plot_end_effector_path(positions, task_colors, key=None):
     st.plotly_chart(fig, use_container_width=True, config=PLOTLY_CONFIG, key=key)
 
 
-# 3. plot_2d_robot (Matplotlib)
 def plot_2d_robot(action, num_joints, color=NEON_PURPLE, title="Current Joint Position Visualization"):
-    # ... (Matplotlib code - unchanged) ...
-    import matplotlib.pyplot as plt
     
     x, y = [0], [0]
     angle = 0
@@ -238,9 +215,7 @@ def plot_2d_robot(action, num_joints, color=NEON_PURPLE, title="Current Joint Po
     st.pyplot(fig) 
 
 
-# 4. plot_performance_graph (Neon Line Graph)
-def plot_performance_graph(robot_actions, title="📊 Joint Action Magnitude per Task", key=None): 
-    # ... (Unchanged from previous fix) ...
+def plot_performance_graph(robot_actions, title="Joint Action Magnitude per Task", key=None): 
     if not robot_actions:
         st.info("No actions data available for performance graph.")
         return
@@ -276,9 +251,7 @@ def plot_performance_graph(robot_actions, title="📊 Joint Action Magnitude per
     st.plotly_chart(fig, use_container_width=True, config=PLOTLY_CONFIG, key=key) 
 
 
-# 5. plot_performance_bar_3d (Neon Bar Chart)
 def plot_performance_bar_3d(robot_actions, tasks_df, key=None): 
-    # ... (Unchanged from previous fix) ...
     if not robot_actions or tasks_df.empty:
         st.info("No data for 3D performance bar chart.")
         return
@@ -308,7 +281,7 @@ def plot_performance_bar_3d(robot_actions, tasks_df, key=None):
     fig = go.Figure(data=data)
 
     fig.update_layout(
-        title='**📈 Average Joint Action Magnitude by Task Type**',
+        title='**Average Joint Action Magnitude by Task Type**',
         barmode='group',
         scene=dict(
             xaxis_title='Task Type',

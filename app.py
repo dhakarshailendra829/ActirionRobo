@@ -1,13 +1,11 @@
-# app.py - FINAL CORRECTED VERSION: Fixed StreamlitDuplicateElementId + AUTOPLAY/ANIMATION
 import sys, os
 import streamlit as st
 import torch
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import time # NEW: For animation delay
+import time 
 
-# Import updated local modules
 from scheduler import generate_tasks
 from robot_env import RobotEnv
 from visualization import (
@@ -18,17 +16,14 @@ from visualization import (
     plot_performance_bar_3d
 )
 
-# NEW IMPORT for advanced functionality
 from training_loop import train_imitation_model 
 
-# --- Configuration & Model Setup ---
 st.set_page_config(
     page_title="Advanced Smart Robot Simulator", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Model setup (unchanged)
 input_dim = 50
 output_dim = 6
 device = torch.device("cpu")
@@ -57,34 +52,27 @@ try:
         model.load_state_dict(torch.load(model_path, map_location=device))
         st.sidebar.markdown(f'<div style="background-color: #007700; color: white; padding: 5px; border-radius: 5px; font-size: 14px; text-align: center;">Trained imitation model loaded</div>', unsafe_allow_html=True)
     else:
-        st.sidebar.warning("⚠️ Model file not found. Using untrained model.")
+        st.sidebar.warning("Model file not found. Using untrained model.")
 except Exception as e:
     st.sidebar.error(f"Error loading model: {e}")
 
 model.eval()
 robot = RobotEnv(num_joints=output_dim)
 robot.reset()
-# -------------------------
-
-# --- SESSION STATE INITIALIZATION FOR ANIMATION ---
 if 'autoplay_enabled' not in st.session_state:
     st.session_state.autoplay_enabled = False
 if 'current_task_index' not in st.session_state:
     st.session_state.current_task_index = 0
 if 'rotation_angle_y' not in st.session_state:
-    st.session_state.rotation_angle_y = 1.5 # Initial camera rotation 
-# ----------------------------------------------------
+    st.session_state.rotation_angle_y = 1.5 
 
-
-# --- Sidebar Controls ---
 with st.sidebar:
-    st.header("⚙️ Task Scheduler Settings")
-    
-    # --- AUTOPLAY SWITCH ADDED HERE ---
+    st.header("Task Scheduler Settings")
+
     st.markdown("---")
     st.subheader("Animation Controls")
     st.session_state.autoplay_enabled = st.checkbox(
-        "🔄 Enable Auto-Play (Animate Tasks)", 
+        "Enable Auto-Play (Animate Tasks)", 
         value=st.session_state.autoplay_enabled,
         key="autoplay_switch"
     )
@@ -102,18 +90,13 @@ with st.sidebar:
     st.subheader("Manual Joint Control")
     joint_sliders = [st.slider(f"Joint {i}", -np.pi, np.pi, 0.0, key=f"manual_joint_{i}") for i in range(output_dim)]
     
-    # Run button should reset animation state
-    if st.button("🚀 Generate & Run Simulation", type="primary"):
-        st.session_state.current_task_index = 0 # Reset animation index
-        st.session_state.rotation_angle_y = 1.5 # Reset rotation
-        # Set a flag to ensure simulation runs even if autoplay is off
+    if st.button("Generate & Run Simulation", type="primary"):
+        st.session_state.current_task_index = 0 
+        st.session_state.rotation_angle_y = 1.5 
         st.session_state['run_simulation_flag'] = True
     else:
         st.session_state['run_simulation_flag'] = False
-# ------------------------------------
-
-# --- Main Title and Description ---
-st.title("🤖 Advanced Self-Learning Industrial Robot Simulator")
+st.title("Advanced Self-Learning Industrial Robot Simulator")
 st.markdown("""
 This simulator demonstrates an **AI-powered robotic arm** that learns and executes tasks. It includes:
 * Intelligent task scheduling
@@ -122,17 +105,15 @@ This simulator demonstrates an **AI-powered robotic arm** that learns and execut
 * 3D path & performance analysis
 """)
 
-# --- Main Content: Tabs ---
 tab_overview, tab_scheduling, tab_3d_viz, tab_data_analysis, tab_training = st.tabs([
     "Overview", 
     "Task Scheduling", 
     "3D Visualization", 
     "Data Analysis",
-    "🧠 Training" 
+    "Training" 
 ])
 
-# --- Scheduled Tasks Header ---
-st.subheader("📋 Scheduled Tasks")
+st.subheader("Scheduled Tasks")
 
 if 'tasks_df' not in st.session_state:
     st.session_state['tasks_df'] = pd.DataFrame(columns=['task_type'] + [f'human_{i}' for i in range(45)] + [f'obj_{i}' for i in range(5)])
@@ -185,39 +166,29 @@ if st.session_state['run_simulation_flag']:
     st.session_state['end_effector_positions'] = end_effector_positions
     st.session_state['task_colors'] = task_colors
     
-    st.toast("✅ Simulation Run Complete! Visualizations updated.")
+    st.toast("Simulation Run Complete! Visualizations updated.")
     
-# ----------------- TAB: Overview (With Animation Logic) -----------------
 with tab_overview:
     
     col_3d_robot, col_3d_scatter = st.columns([1, 1])
     
     if st.session_state['robot_actions']:
         
-        # Determine the action set to display based on autoplay status
         actions_list = st.session_state['robot_actions']
         num_actions = len(actions_list)
         
         if st.session_state.autoplay_enabled:
-            # Display current task position
             display_index = st.session_state.current_task_index % num_actions
         else:
-            # Display final position if autoplay is off, or the first task if index is 0
             display_index = num_actions - 1 
 
         current_action_set = [actions_list[display_index]]
 
-        # --- Dynamic Rotation Update ---
-        # Update rotation angle for the next frame
         if st.session_state.autoplay_enabled:
             st.session_state.rotation_angle_y = (st.session_state.rotation_angle_y + 0.05) % (2 * np.pi) 
 
-        # --- 3D Robot Plot ---
         with col_3d_robot:
             st.markdown("### Intelligent Task Scheduling")
-            # NOTE: We need to pass the rotation angle to visualization.py if we want the plot to spin.
-            # Since plot_3d_robot doesn't accept a camera angle yet, this plot won't spin unless we update visualization.py again.
-            # For now, we only use the animation to cycle through tasks.
             plot_3d_robot(
                 current_action_set,
                 output_dim,
@@ -227,7 +198,6 @@ with tab_overview:
                 key="overview_3d_robot_plot"
             )
 
-        # --- Trajectory Plot ---
         with col_3d_scatter:
             st.markdown("### 2D & 3D Trajectory Visualization")
             plot_end_effector_path(
@@ -236,22 +206,17 @@ with tab_overview:
                 key="overview_trajectory_plot" 
             )
             
-        # --- AUTOPLAY LOOP ---
         if st.session_state.autoplay_enabled:
-            # Move to the next index
             next_index = (st.session_state.current_task_index + 1) % num_actions
             st.session_state.current_task_index = next_index
-
-            # Pause and Rerun (Creates the animation effect)
-            time.sleep(0.5) # Animation speed (0.5 seconds per task)
+            time.sleep(0.5) 
             st.rerun() 
             
     else:
         st.info("Run the simulation to generate the 3D visualizations.")
 
-# ----------------- Other Tabs (Unchanged logic) -----------------
 with tab_scheduling:
-    st.header("📋 AI Task Scheduling & Predicted Actions")
+    st.header("AI Task Scheduling & Predicted Actions")
     
     if st.session_state['robot_actions']:
         st.subheader("Predicted Robot Actions (Joint Angles)")
@@ -262,7 +227,7 @@ with tab_scheduling:
 
 
 with tab_3d_viz:
-    st.header("👁️ Detailed 3D Trajectory Analysis")
+    st.header("Detailed 3D Trajectory Analysis")
     
     if st.session_state['robot_actions']:
         plot_end_effector_path(
@@ -274,7 +239,7 @@ with tab_3d_viz:
         st.info("Run the simulation to generate detailed 3D trajectory plots.")
         
 with tab_data_analysis:
-    st.header("📈 Performance & Data Analysis")
+    st.header("Performance & Data Analysis")
     
     if st.session_state['robot_actions']:
         colA, colB = st.columns([1, 1])
@@ -290,10 +255,10 @@ with tab_data_analysis:
         st.info("Run the simulation to generate performance analysis charts.")
         
 with tab_training:
-    st.header("🧠 AI Model Training & Optimization")
+    st.header("AI Model Training & Optimization")
     
     if 'tasks_df' not in st.session_state or st.session_state['tasks_df'].empty:
-        st.warning("⚠️ Run the simulation first to generate data for training.")
+        st.warning("Run the simulation first to generate data for training.")
     else:
         st.subheader("Training Parameters")
         
@@ -303,13 +268,13 @@ with tab_training:
         with col_param2:
             lr = st.number_input("Learning Rate", min_value=1e-5, max_value=0.1, value=0.001, format="%e", key="training_lr")
         
-        train_button = st.button("🔴 Start Training", type="secondary")
+        train_button = st.button("Start Training", type="secondary")
         
         if train_button:
             with st.spinner(f"Training model for {epochs} epochs..."):
                 loss_history = train_imitation_model(model, st.session_state['tasks_df'].copy(), epochs, lr)
             
-            st.success("✅ Training Complete!")
+            st.success("Training Complete!")
             
             st.subheader("Training Loss History")
             fig_loss = go.Figure(data=[go.Scatter(y=loss_history, mode='lines+markers', name='Loss', 
