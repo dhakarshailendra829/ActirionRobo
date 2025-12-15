@@ -240,7 +240,6 @@ with tab_data_analysis:
         fig.add_trace(go.Scatter(x=metrics['timestamps'], y=metrics['cpu_usage'], mode='lines+markers', line=dict(color='#33CCFF')), row=1, col=2)
         fig.add_trace(go.Scatter(x=metrics['timestamps'], y=metrics['task_success'], mode='lines+markers', line=dict(color='#66FF33')), row=2, col=1)
         fig.add_trace(go.Scatter(x=metrics['timestamps'][:len(distances)], y=distances, mode='lines+markers', line=dict(color='#FF3333')), row=2, col=2)
-        
         fig.update_layout(height=600, template="plotly_dark", showlegend=False)
         st.plotly_chart(fig, use_container_width=True)
         
@@ -265,7 +264,6 @@ with tab_training:
                 loss_history = [0.5 - 0.01*i + np.random.rand()*0.05 for i in range(epochs)]
             
             st.success("Training Complete!")
-            
             fig_loss = go.Figure()
             fig_loss.add_trace(go.Scatter(y=loss_history, mode='lines+markers', line=dict(color='#00FF88')))
             fig_loss.update_layout(title="Model Training Loss", xaxis_title="Epoch", yaxis_title="MSE Loss", template="plotly_dark", height=400)
