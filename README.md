@@ -1,7 +1,7 @@
 <h1 align="center"> AI Robot 3D Simulator</h1>
 
 <p align="center">
-  <img src="images/RobotLogo.png" width="110" alt="AI Robot 3D Simulator Logo" />
+  <img src="images/Logo.png" width="150" alt="AI Robot 3D Simulator Logo" />
 </p>
 
 <p align="center">
