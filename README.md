@@ -1,4 +1,4 @@
-<h1 align="center"> ActirionRobo</h1>
+<h1 align="center"> <span style="color:#4F46E5">Actirion</span><span style="color:#16A34A">Robo</span></h1>
 
 <p align="center">
   <img src="images/Logo.png" width="150" alt="ActirionRobo Logo" />
@@ -37,7 +37,6 @@ Evaluating learned behaviors beyond raw accuracy
 
 Scaling experimental robotics systems toward industry workflows
 
-Most tools focus on either simulation or learning, but lack an integrated, explainable, and extensible platform.
 ---
 
 ## Solution Overview
@@ -52,7 +51,6 @@ Real-time 3D visualization
 
 System analytics and benchmarking
 
-It mirrors industry robotics pipelines, enabling experimentation, evaluation, and future deployment readiness.
 ---
 
 ## Core Capabilities
@@ -187,13 +185,15 @@ cd AI_Robot_3D_Simulator
 pip install -r requirements.txt
 streamlit run app.py
 ```
-
 ## Project Status
 
-ActirionRobo is an open-source, academic, and experimental platform intended for learning, research, and system prototyping.
+ActirionRobo is an open-source, academic, and experimental platform intended for learning, research, and system prototyping.  
 It is not affiliated with any commercial robotics product.
+
 ---
-👤 Author
-Shailendra Dhakad
+
+## 👤 Author
+
+**Shailendra Dhakad**  
 AI • Robotics • Software Systems Engineering
----
+
