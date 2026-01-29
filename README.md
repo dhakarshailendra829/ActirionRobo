@@ -80,41 +80,36 @@ System analytics and benchmarking
 ---
 
 ## System Architecture
-+---------------------+
-|   User / Operator   |
-+----------+----------+
-           |
-           v
-+---------------------+
-| Interactive Web UI  |
-| (Streamlit + Plotly)|
-+----------+----------+
-           |
-           v
-+---------------------+
-| Task Scheduler &    |
-| Control Layer       |
-+----------+----------+
-           |
-           v
-+---------------------+
-| AI Learning &       |
-| Inference Engine    |
-| (PyTorch)           |
-+----------+----------+
-           |
-           v
-+---------------------+
-| Robot Environment   |
-| Core                |
-+----------+----------+
-           |
-           v
-+---------------------+
-| 3D Visualization & |
-| Analytics Engine   |
-+---------------------+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant BLE as BLE Source (Sensor)
+    participant UDP as UDP Socket (Ingress)
+    participant GW as Gateway Sorter (Actirion Core)
+    participant CAN as vCAN (Virtual Bus)
+    participant UI as Dashboard (Streamlit)
 
+    Note over BLE, UDP: Low-Latency Data Acquisition
+    BLE-->>UDP: Steering Data + Timestamp
+    UDP-->>GW: Raw Bytes → Priority Queue
+    
+    Note right of GW: Industrial Zero‑Copy Struct Packing
+    GW->>GW: Serialize for vCAN
+
+    rect rgb(240, 240, 240)
+    Note over GW, CAN: Parallel Execution (Multi-threaded)
+    par Critical Control
+        GW-->>CAN: 0x100 [High Priority Steering]
+    and Telemetry
+        GW-->>CAN: 0x200 [System Telemetry]
+    and Safety Watchdog
+        GW-->>CAN: 0x7FF [Safety Heartbeat]
+    end
+    end
+
+    Note over CAN, UI: Telemetry Visualization
+    CAN-->>UI: Real‑Time Status (μs Latency)
+```m
 ## End-to-End Workflow
 ```mermaid
 sequenceDiagram
