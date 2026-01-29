@@ -80,20 +80,18 @@ System analytics and benchmarking
 ---
 
 ## System Architecture
+
 flowchart TD
-    U[User / Operator] --> UI[Interactive Web UI\n(Streamlit + Plotly)]
-
+    U[User / Operator] --> UI[Interactive Web UI\nStreamlit + Plotly]
     UI --> TS[Task Scheduler & Control Layer]
-
-    TS --> AI[AI Learning & Inference Engine\n(PyTorch)]
-
+    TS --> AI[AI Learning & Inference Engine\nPyTorch]
     AI --> ENV[Robot Environment Core]
-
     ENV --> VIS[3D Visualization & Analytics Engine]
-
     VIS --> UI
 
-
+    style UI fill:#f9f,stroke:#333,stroke-width:2px
+    style AI fill:#bbf,stroke:#333,stroke-width:2px
+    style ENV fill:#dfd,stroke:#333,stroke-width:2px
 ## End-to-End Workflow
 ```mermaid
 sequenceDiagram
