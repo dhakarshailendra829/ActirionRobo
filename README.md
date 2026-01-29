@@ -80,58 +80,40 @@ System analytics and benchmarking
 ---
 
 ## System Architecture
+```mermaid
+flowchart TD
+    U[User / Operator] --> UI[Interactive Web UI<br/>(Streamlit + Plotly)]
 
-+---------------------+
-|   User / Operator   |
-+----------+----------+
-           |
-           v
-+---------------------+
-| Interactive Web UI  |
-| (Streamlit + Plotly)|
-+----------+----------+
-           |
-           v
-+---------------------+
-| Task Scheduler &    |
-| Control Layer       |
-+----------+----------+
-           |
-           v
-+---------------------+
-| AI Learning &       |
-| Inference Engine    |
-| (PyTorch)           |
-+----------+----------+
-           |
-           v
-+---------------------+
-| Robot Environment   |
-| Core                |
-+----------+----------+
-           |
-           v
-+---------------------+
-| 3D Visualization & |
-| Analytics Engine   |
-+---------------------+
+    UI --> TS[Task Scheduler &<br/>Control Layer]
+
+    TS --> AI[AI Learning &<br/>Inference Engine<br/>(PyTorch)]
+
+    AI --> ENV[Robot Environment<br/>Core]
+
+    ENV --> VIS[3D Visualization &<br/>Analytics Engine]
+
+    VIS --> UI
+```
 
 ## End-to-End Workflow
+```mermaid
+sequenceDiagram
+    participant H as Human / Sensors
+    participant FE as Feature Engineering
+    participant ML as AI Action Learning Model
+    participant JP as Joint-Level Prediction
+    participant TS as Task Scheduler
+    participant ENV as Robot Environment
+    participant VIS as 3D Visualization & Analytics
 
-Human + Object Interaction Data
-            ↓
-Feature Engineering & Normalization
-            ↓
-AI Action Learning Model
-            ↓
-Joint-Level Predictions
-            ↓
-Task Scheduler
-            ↓
-Robot Environment Execution
-            ↓
-3D Visualization & Analytics
-
+    H-->>FE: Interaction + State Data
+    FE-->>ML: Normalized Features
+    ML-->>JP: Learned Actions
+    JP-->>TS: Control Commands
+    TS-->>ENV: Execute Tasks
+    ENV-->>VIS: State + Metrics
+    VIS-->>H: Visual Feedback
+```
 ---
 
 ## Benchmarks & Experiments
@@ -170,10 +152,10 @@ Robot Environment Execution
 
 ## Tech Stack
 
-**AI & ML:** Python, PyTorch, NumPy, Pandas  
-**Visualization:** Streamlit, Plotly  
-**System Engineering:** Modular Python architecture  
-**Monitoring:** psutil, logging utilities  
+- **AI & ML:** Python, PyTorch, NumPy, Pandas  
+- **Visualization:** Streamlit, Plotly  
+- **System Engineering:** Modular Python architecture  
+- **Monitoring:** psutil, logging utilities  
 
 ---
 
