@@ -27,7 +27,7 @@
 
 ---
 
-## Problem & Motivation
+## Problem Description
 
 Robotics development often suffers from fragmented systems where learning, control, and visualization are handled in isolation. This creates challenges in:
 
